@@ -1,0 +1,8 @@
+# @package _global_
+defaults:
+  - override /files: ocsge
+  - override /datamodule: ocsge
+  - override /transforms: ocsge
+  - override /loss: ocsge
+  - override /logger: ocsge
+  - override /model: ocsge

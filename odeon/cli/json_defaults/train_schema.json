@@ -1,0 +1,145 @@
+{
+    "type": "object",
+    "properties": {
+        "data_source": {
+            "type": "object",
+            "required": [
+                "train_file"
+            ],
+            "properties": {
+                "train_file": {"type": "string"},
+                "val_file": {"type": "string"},
+                "test_file": {"type": "string"},
+                "percentage_val": {"type": "number"},
+                "image_bands": {"type": "array", "items": {"type": "integer"}, "uniqueItems": true},
+                "mask_bands": {"type": "array", "items": {"type": "integer"}, "uniqueItems": true},
+                "class_labels": {"type": "array", "items": {"type": "string"}},
+                "resolution": {"type": ["number", "array"]},
+                "compute_normalization_weights": {"type": "boolean", "default": false},
+                "normalization_weights": {
+                    "type": "object",
+                    "properties": {
+                        "train": {
+                            "mean": {"type": "array", "items": {"type": "number"}},
+                            "std": {"type": "array", "items": {"type": "number"}}
+                        },
+                        "val": {
+                            "mean": {"type": "array", "items": {"type": "number"}},
+                            "std": {"type": "array", "items": {"type": "number"}}
+                        },
+                        "test":{
+                            "mean": {"type": "array", "items": {"type": "number"}},
+                            "std": {"type": "array", "items": {"type": "number"}}
+                        }
+                    }
+                }
+            },
+            "oneOf": [{
+                "required": [
+                    "val_file"
+                ]
+            }, {
+                "required": [
+                    "percentage_val"
+                ]
+            }]
+        },
+        "model_setup": {
+            "type": "object",
+            "required": [
+                "model_name",
+                "output_folder"
+            ],
+            "properties": {
+                "model_name": {"type": "string"},
+                "init_model_weights": {"type": "string"},
+                "load_pretrained_weights": {"type": "string"},
+                "output_folder": {"type": "string"},
+                "output_tensorboard_logs": {"type": "string"},
+                "model_filename": {"type": "string"},
+                "model_out_ext": {"type": "string", "default": ".ckpt"},
+                "name_exp_log": {"type": "string"},
+                "version_name": {"type": "string"},
+                "get_prediction": {"type": "boolean", "default": false},
+                "prediction_output_type": {        
+                    "type": "string",
+                    "enum": ["bit", "uint8", "float32"],
+                    "default": "uint8"}
+            }
+        },
+        "train_setup": {
+            "type": "object",
+            "properties": {
+                "epochs": {"type": "integer", "default": 300},
+                "batch_size": {"type": "integer", "default": 2},
+                "patience": {"type": "integer", "default": 30},
+                "save_history": {"type": "boolean", "default": true},
+                "continue_training": {"type": "boolean", "default": false},
+                "loss": {"type": "string", "default": "ce"},
+                "class imbalance": {"type": "array", "items": {"type": "number"}},
+                "optimizer_config": {
+                    "type": "object",
+                    "properties": {
+                        "optimizer": {"type": "string", "default": "SGD"},
+                        "momentum": {"type": "number", "default": 0},
+                        "dampening": {"type": "number", "default": 0},
+                        "nesterov": {"type": "boolean", "default": false},
+                        "betas": {"type": "array", "default": [0.9, 0.999]},
+                        "eps": {"type": "number", "default": 1e-8},
+                        "weight_decay": {"type": "number", "default": 0},
+                        "amsgrad": {"type": "boolean", "default": false},
+                        "centered": {"type": "boolean", "default": false},
+                        "alpha": {"type": "number", "default": 0.99}
+                    }
+                },
+                "scheduler_config" : {
+                    "type": "object",
+                    "properties": {
+                        "scheduler": {"type": "string", "default": "reducelronplateau"},
+                        "mode": {"type": "string", "default": "min"},
+                        "factor": {"type": "number", "default": 0.5},
+                        "patience": {"type": "integer", "default": 30},
+                        "cooldown": {"type": "integer", "default": 4},
+                        "min_lr": {"type": "number", "default": 1e-7},
+                        "base_lr": {"type": "number", "default": 1e-3},
+                        "max_lr": {"type": "number", "default": 1e-1},
+                        "step_size_up": {"type": "number", "default": 2000},
+                        "step_size_down": {"type": "number", "default": 2000},
+                        "T_max": {"type": "number", "default": 2000},
+                        "T_0": {"type": "number", "default": 5},
+                        "T_mult": {"type": "number", "default": 1},
+                        "eta_min": {"type": "number", "default": 0},
+                        "last_epoch": {"type": "number", "default": -1}
+                    }
+                },
+                "lr": {"type": "number", "default": 0.01},
+                "num_workers": {"type": "integer", "default": 4},
+                "data_augmentation": {
+                    "type": "object",
+                    "properties": {
+                        "train": {"type": ["string", "array"], "default": ["rotation90"]},
+                        "val": {"type": ["string", "array"]},
+                        "test": {"type": ["string", "array"]}
+                    }
+                },
+                "device": {"type": ["string", "array", "integer"]},
+                "accelerator": {"type": "string", "enum":["auto", "gpu", "ipu", "tpu", "cpu"], "default": "gpu"},
+                "num_nodes": {"type": "integer", "default": 1},
+                "num_processes": {"type": "integer", "default": 1},
+                "reproducible": {"type": "boolean", "default": false},
+                "log_histogram": {"type": "boolean", "default": false},
+                "log_graph": {"type": "boolean", "default": false},
+                "log_predictions": {"type": "boolean", "default": false},
+                "log_learning_rate": {"type": "boolean", "default": false},
+                "log_hparams": {"type": "boolean", "default": false},
+                "val_check_interval": {"type": "number"},
+                "strategy": {"type": "string"},
+                "early_stopping": {"type": ["string", "boolean"]},
+                "save_top_k":  {"type": "integer", "default": 3},
+                "use_wandb": {"type": "boolean", "default": false},
+                "testing": {"type": "boolean", "default": false},
+                "progress":  {"type": "integer", "default": 1}
+            }
+        }
+    }
+}
